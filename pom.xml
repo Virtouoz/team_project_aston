@@ -31,6 +31,16 @@
             </roles>
             <timezone>+3</timezone>
         </developer>
+        <developer>
+            <id>elmuss</id>
+            <name>Мусийчук Елена</name>
+            <email>el.muss@yandex.ru</email>
+            <roles>
+                <role>dev</role>
+                <role>custom collection</role>
+            </roles>
+            <timezone>+3</timezone>
+        </developer>
     </developers>
 
     <organization>
