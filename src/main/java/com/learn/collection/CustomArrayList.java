@@ -1,8 +1,11 @@
-package com.learn.CustomCollection;
+package com.learn.collection;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public class CustomArrayList<E> {
+public class CustomArrayList<E> implements Iterable<E> {
     private Object[] data;
     private int size;
     private static final int DEFAULT_SIZE = 10;
@@ -22,10 +25,12 @@ public class CustomArrayList<E> {
     private void ensureCapacity() {
         if (size >= data.length) {
             int newCapacity = data.length * 2;
-            Object[] newData = new Object[newCapacity];
-            for (int i = 0; i < data.length; i++) {
-                newData[i] = data[i];
+            if (newCapacity < DEFAULT_SIZE) {
+                newCapacity = DEFAULT_SIZE;
             }
+            Object[] newData = new Object[newCapacity];
+
+            System.arraycopy(data, 0, newData, 0, data.length);
             data = newData;
         }
     }
@@ -38,15 +43,41 @@ public class CustomArrayList<E> {
         }
     }
 
+    private void checkInsertIndex(int index) {
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException(
+                    "Индекс для вставки " + index + ", допустимый диапазон: [0, " + size + "]"
+            );
+        }
+    }
+
     public void add(E element) {
         ensureCapacity();
         data[size++] = element;
+    }
+
+    public void add(int index, E element) {
+        checkInsertIndex(index);
+        ensureCapacity();
+
+        System.arraycopy(data, index, data, index + 1, size - index);
+        data[index] = element;
+        size++;
     }
 
     @SuppressWarnings("unchecked")
     public E get(int index) {
         checkIndex(index);
         return (E) data[index];
+    }
+
+    public int indexOf(Object o) {
+        for (int i = 0; i < size; i++) {
+            if (Objects.equals(o, data[i])) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public void set(int index, E element) {
@@ -67,13 +98,17 @@ public class CustomArrayList<E> {
         checkIndex(index);
         E removedElement = (E) data[index];
 
-        for (int i = index; i < size - 1; i++) {
-            data[i] = data[i + 1];
-        }
+        System.arraycopy(data, index + 1, data, index, size - index - 1);
         size--;
         data[size] = null;
 
         return removedElement;
+    }
+
+    public void trimToSize() {
+        if (data.length > size) {
+            data = Arrays.copyOf(data, size);
+        }
     }
 
     public boolean contains(Object element) {
@@ -90,6 +125,27 @@ public class CustomArrayList<E> {
             data[i] = null;
         }
         size = 0;
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return new Iterator<>() {
+            private int currentIndex = 0;
+
+            @Override
+            public boolean hasNext() {
+                return currentIndex < size;
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public E next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                return (E) data[currentIndex++];
+            }
+        };
     }
 
     @Override
