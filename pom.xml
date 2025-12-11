@@ -7,6 +7,46 @@
     <groupId>com.learn</groupId>
     <artifactId>team_project</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <name>Aston Project</name>
+    <developers>
+        <!-- Добавьте себя -->
+        <!-- TODO-->
+        <developer>
+            <id>id</id>
+            <name>Name</name>
+            <email>email@qwe.ru</email>
+            <roles>
+                <role>role</role>
+                <role>что делаю</role>
+            </roles>
+            <timezone>+3</timezone>
+        </developer>
+        <developer>
+            <id>alexk</id>
+            <name>Клюцук Александр</name>
+            <email>alex.kliutsuk@gmail.com</email>
+            <roles>
+                <role>Team Lead</role>
+                <role>to do</role>
+            </roles>
+            <timezone>+3</timezone>
+        </developer>
+        <developer>
+            <id>elmuss</id>
+            <name>Мусийчук Елена</name>
+            <email>el.muss@yandex.ru</email>
+            <roles>
+                <role>dev</role>
+                <role>custom collection</role>
+            </roles>
+            <timezone>+3</timezone>
+        </developer>
+    </developers>
+
+    <organization>
+        <name>Aston</name>
+        <url>https://astondevs.ru/</url>
+    </organization>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
