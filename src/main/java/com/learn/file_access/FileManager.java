@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.learn.collection.CustomArrayList;
 import com.learn.exceptions.CustomFileAccessException;
 import com.learn.exceptions.FileParseException;
 import com.learn.exceptions.UnsupportedFileTypeException;
@@ -26,13 +27,13 @@ public class FileManager {
         return instance;
     }
 
-    public void writeData(Iterable<Student> studentsData) throws IOException {
-        final String DEFAULT_WR_FILE_PATH = "src/main/resources/DataFiles/WriteTest.json";
+    public void writeData(CustomArrayList<Student> studentsData) throws IOException {
+        final String DEFAULT_WR_FILE_PATH = "src/main/resources/data_files/WriteTest.json";
         writeData(studentsData, DEFAULT_WR_FILE_PATH);
     }
 
     // TODO: type dep
-    public void writeData(Iterable<Student> studentsData, String path) throws IOException {
+    public void writeData(CustomArrayList<Student> studentsData, String path) throws IOException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Path finalPath = Paths.get(path).toAbsolutePath();
         FileReader reader = new FileReader(finalPath.toString());
@@ -54,7 +55,7 @@ public class FileManager {
     }
 
     public Iterable<Student> loadData() throws IOException {
-        final String DEFAULT_DATA_SET_FILE_PATH = "src/main/resources/DataFiles/Students.json";
+        final String DEFAULT_DATA_SET_FILE_PATH = "src/main/resources/data_files/Students.json";
         return loadData(DEFAULT_DATA_SET_FILE_PATH);
     }
 
@@ -64,7 +65,7 @@ public class FileManager {
         if (finalPath.toFile().isDirectory())
             throw new CustomFileAccessException("Requested target is not a File!");
 
-        Student[] parsedStudentsData = null;
+        CustomArrayList<Student> parsedStudentsData = new CustomArrayList<>();
 
         String fileExtension = getFileExtension(finalPath.getFileName().toString());
         switch (fileExtension) {
@@ -72,7 +73,11 @@ public class FileManager {
                 Gson gson = new Gson();
                 FileReader reader = new FileReader(finalPath.toString());
 
-                parsedStudentsData = gson.fromJson(reader, Student[].class);
+                Student[] students = gson.fromJson(reader, Student[].class);
+
+                for(Student student : students) {
+                    parsedStudentsData.add(student);
+                }
 
                 reader.close();
                 break;
@@ -80,13 +85,10 @@ public class FileManager {
                 throw new UnsupportedFileTypeException(finalPath);
         }
 
-        if (parsedStudentsData == null)
-            return null;
-
-        if (finalPath.toFile().length() > 0 && parsedStudentsData.length == 0)
+        if (finalPath.toFile().length() > 0 && parsedStudentsData.isEmpty())
             throw new FileParseException(finalPath);
 
-        return Arrays.asList(parsedStudentsData);
+        return parsedStudentsData;
     }
 
     public String getFileExtension(String fileName) {
