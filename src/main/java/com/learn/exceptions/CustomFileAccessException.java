@@ -1,4 +1,4 @@
-package com.learn.Exceptions;
+package com.learn.exceptions;
 
 import java.io.IOException;
 

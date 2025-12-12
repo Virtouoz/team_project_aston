@@ -1,13 +1,13 @@
-package com.learn.FileAccess;
+package com.learn.file_access;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.learn.Exceptions.CustomFileAccessException;
-import com.learn.Exceptions.FileParseException;
-import com.learn.Exceptions.UnsupportedFileTypeException;
+import com.learn.exceptions.CustomFileAccessException;
+import com.learn.exceptions.FileParseException;
+import com.learn.exceptions.UnsupportedFileTypeException;
 import com.learn.model.Student;
 
 import java.io.FileReader;
@@ -64,7 +64,7 @@ public class FileManager {
         if (finalPath.toFile().isDirectory())
             throw new CustomFileAccessException("Requested target is not a File!");
 
-        Student[] parsedStudentsData = new Student[]{};
+        Student[] parsedStudentsData = null;
 
         String fileExtension = getFileExtension(finalPath.getFileName().toString());
         switch (fileExtension) {
@@ -79,6 +79,9 @@ public class FileManager {
             default:
                 throw new UnsupportedFileTypeException(finalPath);
         }
+
+        if (parsedStudentsData == null)
+            return null;
 
         if (finalPath.toFile().length() > 0 && parsedStudentsData.length == 0)
             throw new FileParseException(finalPath);
