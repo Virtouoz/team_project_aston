@@ -1,18 +1,23 @@
 package com.learn.sort;
 
+import com.learn.collection.CustomArrayList;
 import com.learn.model.Student;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
-public class MergeSort {
-    public static void sort(List<Student> students) {
+public class MergeSort implements SortStrategy {
+    private Comparator<Student> comparator;
+
+    @Override
+    public void sort(List<Student> students, Comparator<Student> comparator) {
         if (students == null || students.size() <= 1) {
             return;
         }
+        this.comparator = comparator;
         mergeSort(students, 0, students.size() - 1);
     }
 
-    private static void mergeSort(List<Student> students, int left, int right) {
+    private void mergeSort(List<Student> students, int left, int right) {
         if (left < right) {
             int mid = left + (right - left) / 2;
             mergeSort(students, left, mid);
@@ -21,9 +26,9 @@ public class MergeSort {
         }
     }
 
-    private static void merge(List<Student> students, int left, int mid, int right) {
-        List<Student> leftList = new ArrayList<>();
-        List<Student> rightList = new ArrayList<>();
+    private void merge(List<Student> students, int left, int mid, int right) {
+        List<Student> leftList = new CustomArrayList<Student>();
+        List<Student> rightList = new CustomArrayList<Student>();
 
         for (int i = left; i <= mid; i++) {
             leftList.add(students.get(i));
@@ -34,7 +39,7 @@ public class MergeSort {
 
         int i = 0, j = 0, k = left;
         while (i < leftList.size() && j < rightList.size()) {
-            if (leftList.get(i).getRecordBookNumber() <= rightList.get(j).getRecordBookNumber()) {
+            if (comparator.compare(leftList.get(i), rightList.get(j)) <= 0) {
                 students.set(k++, leftList.get(i++));
             } else {
                 students.set(k++, rightList.get(j++));
