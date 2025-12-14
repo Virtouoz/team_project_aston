@@ -5,22 +5,13 @@ import com.learn.model.Student;
 import com.learn.sort.*;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
-    private static final List<Student> students = new CustomArrayList<Student>();
+    private static List<Student> students = new CustomArrayList<Student>();
     private static final Scanner scanner = new Scanner(System.in);
-
-    static {
-        students.add(new Student("A", 4.5, 5));
-        students.add(new Student("B", 3.8, 2));
-        students.add(new Student("C", 4.2, 7));
-        students.add(new Student("D", 4.9, 4));
-        students.add(new Student("E", 3.5, 9));
-        students.add(new Student("F", 4.7, 6));
-        students.add(new Student("G", 3.9, 3));
-        students.add(new Student("H", 5.0, 8));
-    }
+    private static final Random random = new Random();
 
     public static void main(String[] args) {
         boolean running = true;
@@ -29,8 +20,9 @@ public class Main {
             int choice = getChoice();
             
             switch (choice) {
-                case 1 -> showOriginalList();
-                case 2 -> sortMenu();
+                case 1 -> fillDataMenu();
+                case 2 -> showOriginalList();
+                case 3 -> sortMenu();
                 case 0 -> running = false;
                 default -> System.out.println("Неверный выбор. Попробуйте снова.");
             }
@@ -45,13 +37,137 @@ public class Main {
 
     private static void printMenu() {
         System.out.println("\n=== Меню сортировки студентов ===");
-        System.out.println("1. Показать исходный список");
-        System.out.println("2. Выполнить сортировку");
+        System.out.println("1. Заполнить список студентов");
+        System.out.println("2. Показать исходный список");
+        System.out.println("3. Выполнить сортировку");
         System.out.println("0. Выход");
         System.out.print("Выберите действие: ");
     }
 
+    private static void fillDataMenu() {
+        System.out.println("\n=== Заполнение списка студентов ===");
+        System.out.print("Введите размер списка (положительное число): ");
+        int size = getPositiveInt();
+        if (size <= 0) {
+            System.out.println("Размер должен быть положительным числом!");
+            return;
+        }
+
+        System.out.println("\nВыберите способ заполнения:");
+        System.out.println("1. Заполнить случайными данными");
+        System.out.println("2. Заполнить вручную");
+        System.out.print("Ваш выбор: ");
+        
+        int fillChoice = getChoice();
+        students = new CustomArrayList<Student>(size);
+        
+        switch (fillChoice) {
+            case 1 -> fillRandomData(size);
+            case 2 -> fillManualData(size);
+            default -> {
+                System.out.println("Неверный выбор. Список не заполнен.");
+                students = new CustomArrayList<Student>();
+            }
+        }
+        
+        if (!students.isEmpty()) {
+            System.out.println("\nСписок успешно заполнен! Количество студентов: " + students.size());
+        }
+    }
+
+    private static void fillRandomData(int size) {
+        String[] groupNumbers = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
+        
+        for (int i = 0; i < size; i++) {
+            String groupNumber = groupNumbers[random.nextInt(groupNumbers.length)];
+            double averageGrade = Math.round((2.0 + random.nextDouble() * 3.0) * 10.0) / 10.0; // от 2.0 до 5.0
+            int recordBookNumber = random.nextInt(9999) + 1; // от 1 до 9999
+            
+            try {
+                students.add(new Student(groupNumber, averageGrade, recordBookNumber));
+            } catch (IllegalArgumentException e) {
+                System.out.println("Ошибка при создании студента: " + e.getMessage());
+                i--; // повторить попытку
+            }
+        }
+    }
+
+    private static void fillManualData(int size) {
+        System.out.println("\nВведите данные для каждого студента:");
+        for (int i = 0; i < size; i++) {
+            System.out.println("\n--- Студент #" + (i + 1) + " ---");
+            
+            String groupNumber = getGroupNumber();
+            double averageGrade = getAverageGrade();
+            int recordBookNumber = getRecordBookNumber();
+            
+            try {
+                students.add(new Student(groupNumber, averageGrade, recordBookNumber));
+                System.out.println("Студент успешно добавлен!");
+            } catch (IllegalArgumentException e) {
+                System.out.println("Ошибка валидации: " + e.getMessage());
+                System.out.println("Попробуйте снова.");
+                i--; // повторить попытку
+            }
+        }
+    }
+
+    private static String getGroupNumber() {
+        while (true) {
+            System.out.print("Введите номер группы: ");
+            String input = scanner.nextLine().trim();
+            if (!input.isEmpty()) {
+                return input;
+            }
+            System.out.println("Номер группы не может быть пустым. Попробуйте снова.");
+        }
+    }
+
+    private static double getAverageGrade() {
+        while (true) {
+            System.out.print("Введите средний балл (0.0 - 5.0): ");
+            try {
+                double grade = Double.parseDouble(scanner.nextLine().trim());
+                if (grade >= 0.0 && grade <= 5.0) {
+                    return grade;
+                }
+                System.out.println("Средний балл должен быть от 0.0 до 5.0. Попробуйте снова.");
+            } catch (NumberFormatException e) {
+                System.out.println("Неверный формат числа. Попробуйте снова.");
+            }
+        }
+    }
+
+    private static int getRecordBookNumber() {
+        while (true) {
+            System.out.print("Введите номер зачетки (положительное число): ");
+            try {
+                int number = Integer.parseInt(scanner.nextLine().trim());
+                if (number > 0) {
+                    return number;
+                }
+                System.out.println("Номер зачетки должен быть положительным числом. Попробуйте снова.");
+            } catch (NumberFormatException e) {
+                System.out.println("Неверный формат числа. Попробуйте снова.");
+            }
+        }
+    }
+
+    private static int getPositiveInt() {
+        try {
+            int value = Integer.parseInt(scanner.nextLine().trim());
+            return value;
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
     private static void sortMenu() {
+        if (students.isEmpty()) {
+            System.out.println("\nСписок студентов пуст! Сначала заполните список (пункт 1).");
+            return;
+        }
+
         System.out.println("\n=== Выберите алгоритм сортировки ===");
         System.out.println("1. Bubble Sort");
         System.out.println("2. Insertion Sort");
@@ -127,7 +243,12 @@ public class Main {
     }
 
     private static void showOriginalList() {
+        if (students.isEmpty()) {
+            System.out.println("\nСписок студентов пуст! Сначала заполните список (пункт 1).");
+            return;
+        }
         System.out.println("\n=== Исходный список ===");
+        System.out.println("Количество студентов: " + students.size());
         printStudents(students);
     }
 
