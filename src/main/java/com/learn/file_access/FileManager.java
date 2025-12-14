@@ -1,22 +1,15 @@
 package com.learn.file_access;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.learn.collection.CustomArrayList;
 import com.learn.exceptions.CustomFileAccessException;
 import com.learn.exceptions.FileParseException;
-import com.learn.exceptions.UnsupportedFileTypeException;
+import com.learn.file_access.handler.ExtensionBasedResolver;
+import com.learn.file_access.handler.FileHandler;
 import com.learn.model.Student;
 
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 public class FileManager {
 
@@ -32,26 +25,12 @@ public class FileManager {
         writeData(studentsData, DEFAULT_WR_FILE_PATH);
     }
 
-    // TODO: type dep
     public void writeData(CustomArrayList<Student> studentsData, String path) throws IOException {
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         Path finalPath = Paths.get(path).toAbsolutePath();
-        FileReader reader = new FileReader(finalPath.toString());
-        JsonArray studentsArray = new JsonArray();
 
-        JsonElement jsonElement = JsonParser.parseReader(reader);
-
-        if (jsonElement.isJsonArray())
-            studentsArray = jsonElement.getAsJsonArray();
-
-        JsonElement newArrayData = gson.toJsonTree(studentsData);
-        studentsArray.add(newArrayData);
-
-        reader.close();
-
-        FileWriter writer = new FileWriter(finalPath.toFile());
-        gson.toJson(studentsArray, writer);
-        writer.close();
+        ExtensionBasedResolver resolver = new ExtensionBasedResolver();
+        FileHandler<CustomArrayList<Student>> fileHandler = resolver.resolve(finalPath);
+        fileHandler.save(studentsData, finalPath);
     }
 
     public Iterable<Student> loadData() throws IOException {
@@ -65,33 +44,13 @@ public class FileManager {
         if (finalPath.toFile().isDirectory())
             throw new CustomFileAccessException("Requested target is not a File!");
 
-        CustomArrayList<Student> parsedStudentsData = new CustomArrayList<>();
-
-        String fileExtension = getFileExtension(finalPath.getFileName().toString());
-        switch (fileExtension) {
-            case ".json":
-                Gson gson = new Gson();
-                FileReader reader = new FileReader(finalPath.toString());
-
-                Student[] students = gson.fromJson(reader, Student[].class);
-
-                for(Student student : students) {
-                    parsedStudentsData.add(student);
-                }
-
-                reader.close();
-                break;
-            default:
-                throw new UnsupportedFileTypeException(finalPath);
-        }
+        ExtensionBasedResolver resolver = new ExtensionBasedResolver();
+        FileHandler<CustomArrayList<Student>> fileHandler = resolver.resolve(finalPath);
+        CustomArrayList<Student> parsedStudentsData = fileHandler.load(finalPath);
 
         if (finalPath.toFile().length() > 0 && parsedStudentsData.isEmpty())
             throw new FileParseException(finalPath);
 
         return parsedStudentsData;
-    }
-
-    public String getFileExtension(String fileName) {
-        return fileName.substring(fileName.lastIndexOf('.'));
     }
 }
