@@ -8,14 +8,14 @@ public class Student {
     private final double averageGrade;
     private final int recordBookNumber;
 
-    public Student(String groupNumber, double averageGrade, int recordBookNumber) {
-        validateGroupNumber(groupNumber);
-        validateAverageGrade(averageGrade);
-        validateRecordBookNumber(recordBookNumber);
+    private Student(Builder builder) {
+        this.groupNumber = builder.groupNumber;
+        this.averageGrade = builder.averageGrade;
+        this.recordBookNumber = builder.recordBookNumber;
 
-        this.groupNumber = groupNumber;
-        this.averageGrade = averageGrade;
-        this.recordBookNumber = recordBookNumber;
+        validateGroupNumber(this.groupNumber);
+        validateAverageGrade(this.averageGrade);
+        validateRecordBookNumber(this.recordBookNumber);
     }
 
     private void validateGroupNumber(String groupNumber) {
