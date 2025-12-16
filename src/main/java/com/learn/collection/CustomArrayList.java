@@ -1,18 +1,15 @@
 package com.learn.collection;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 
-public class CustomArrayList<E> implements Iterable<E> {
-    private volatile Object[] data;
-    private volatile int size;
+public class CustomArrayList<E> implements List<E> {
+    private Object[] data;
+    private int size;
     private static final int DEFAULT_SIZE = 10;
 
     public CustomArrayList(int initialSize) {
         if (initialSize < 0) {
-            throw new IllegalArgumentException("Capacity cannot be negative: " + initialSize);
+            throw new IllegalArgumentException("Ёмкость не может быть отрицательной: " + initialSize);
         }
         this.data = new Object[initialSize];
         this.size = 0;
@@ -22,21 +19,23 @@ public class CustomArrayList<E> implements Iterable<E> {
         this(DEFAULT_SIZE);
     }
 
-    private Object[] ensureCapacity(Object[] currentData, int currentSize) {
-        if (currentSize >= currentData.length) {
-            int newCapacity = currentData.length * 2;
+    private void ensureCapacity() {
+        if (size >= data.length) {
+            int newCapacity = data.length * 2;
             if (newCapacity < DEFAULT_SIZE) {
                 newCapacity = DEFAULT_SIZE;
             }
-            return Arrays.copyOf(currentData, newCapacity);
+            Object[] newData = new Object[newCapacity];
+
+            System.arraycopy(data, 0, newData, 0, data.length);
+            data = newData;
         }
-        return currentData;
     }
 
     private void checkIndex(int index) {
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException(
-                    "Index " + index + ", size: " + size
+                    "Индекс " + index + ", размер: " + size
             );
         }
     }
@@ -44,38 +43,36 @@ public class CustomArrayList<E> implements Iterable<E> {
     private void checkInsertIndex(int index) {
         if (index < 0 || index > size) {
             throw new IndexOutOfBoundsException(
-                    "Insertion index " + index + ", allowed range: [0, " + size + "]"
+                    "Индекс для вставки " + index + ", допустимый диапазон: [0, " + size + "]"
             );
         }
     }
 
-    public void add(E element) {
-        Object[] newData = ensureCapacity(data, size);
-        int newSize = size + 1;
-
-        newData[size] = element;
-
-        data = Arrays.copyOf(newData, newSize);
-        size = newSize;
+    @Override
+    public boolean add(E element) {
+        ensureCapacity();
+        data[size++] = element;
+        return true;
     }
 
+    @Override
     public void add(int index, E element) {
         checkInsertIndex(index);
+        ensureCapacity();
 
-        Object[] newData = Arrays.copyOf(data, size + 1);
-        System.arraycopy(data, index, newData, index + 1, size - index);
-        newData[index] = element;
-
-        data = newData;
+        System.arraycopy(data, index, data, index + 1, size - index);
+        data[index] = element;
         size++;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public E get(int index) {
         checkIndex(index);
         return (E) data[index];
     }
 
+    @Override
     public int indexOf(Object o) {
         for (int i = 0; i < size; i++) {
             if (Objects.equals(o, data[i])) {
@@ -85,42 +82,45 @@ public class CustomArrayList<E> implements Iterable<E> {
         return -1;
     }
 
-    public void set(int index, E element) {
+    @Override
+    @SuppressWarnings("unchecked")
+    public E set(int index, E element) {
         checkIndex(index);
-        Object[] newData = Arrays.copyOf(data, data.length);
-        newData[index] = element;
-        data = newData;
+        E oldValue = (E) data[index];
+        data[index] = element;
+        return oldValue;
     }
 
+    @Override
     public int size() {
         return size;
     }
 
+    @Override
     public boolean isEmpty() {
         return size == 0;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public E remove(int index) {
         checkIndex(index);
         E removedElement = (E) data[index];
-        Object[] newData = new Object[data.length];
-        System.arraycopy(data, 0, newData, 0, index);
-        System.arraycopy(data, index + 1, newData, index, size - index - 1);
 
-        data = Arrays.copyOf(newData, size - 1);
+        System.arraycopy(data, index + 1, data, index, size - index - 1);
         size--;
+        data[size] = null;
 
         return removedElement;
     }
 
     public void trimToSize() {
         if (data.length > size) {
-            Object[] trimmed = Arrays.copyOf(data, size);
-            data = trimmed;
+            data = Arrays.copyOf(data, size);
         }
     }
 
+    @Override
     public boolean contains(Object element) {
         for (int i = 0; i < size; i++) {
             if (Objects.equals(element, data[i])) {
@@ -130,22 +130,32 @@ public class CustomArrayList<E> implements Iterable<E> {
         return false;
     }
 
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        for (Object element : c) {
+            if (!contains(element)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
     public void clear() {
-        data = new Object[DEFAULT_SIZE];
+        for (int i = 0; i < size; i++) {
+            data[i] = null;
+        }
         size = 0;
     }
 
     @Override
     public Iterator<E> iterator() {
-        Object[] currentData = data;
-        int currentDataSize = size;
-
         return new Iterator<>() {
             private int currentIndex = 0;
 
             @Override
             public boolean hasNext() {
-                return currentIndex < currentDataSize;
+                return currentIndex < size;
             }
 
             @Override
@@ -154,9 +164,161 @@ public class CustomArrayList<E> implements Iterable<E> {
                 if (!hasNext()) {
                     throw new NoSuchElementException();
                 }
-                return (E) currentData[currentIndex++];
+                return (E) data[currentIndex++];
             }
         };
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends E> c) {
+        for (E element : c) {
+            add(element);
+        }
+        return !c.isEmpty();
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends E> c) {
+        checkInsertIndex(index);
+        int i = index;
+        for (E element : c) {
+            add(i++, element);
+        }
+        return !c.isEmpty();
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        boolean modified = false;
+        for (int i = size - 1; i >= 0; i--) {
+            if (c.contains(data[i])) {
+                remove(i);
+                modified = true;
+            }
+        }
+        return modified;
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        boolean modified = false;
+        for (int i = size - 1; i >= 0; i--) {
+            if (!c.contains(data[i])) {
+                remove(i);
+                modified = true;
+            }
+        }
+        return modified;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        int index = indexOf(o);
+        if (index >= 0) {
+            remove(index);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+        for (int i = size - 1; i >= 0; i--) {
+            if (Objects.equals(o, data[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public ListIterator<E> listIterator() {
+        return listIterator(0);
+    }
+
+    @Override
+    public ListIterator<E> listIterator(int index) {
+        return new ListIterator<E>() {
+            private int currentIndex = index;
+
+            @Override
+            public boolean hasNext() {
+                return currentIndex < size;
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public E next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                }
+                return (E) data[currentIndex++];
+            }
+
+            @Override
+            public boolean hasPrevious() {
+                return currentIndex > 0;
+            }
+
+            @Override
+            @SuppressWarnings("unchecked")
+            public E previous() {
+                if (!hasPrevious()) {
+                    throw new NoSuchElementException();
+                }
+                return (E) data[--currentIndex];
+            }
+
+            @Override
+            public int nextIndex() {
+                return currentIndex;
+            }
+
+            @Override
+            public int previousIndex() {
+                return currentIndex - 1;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void set(E e) {
+                if (currentIndex > 0 && currentIndex <= size) {
+                    CustomArrayList.this.set(currentIndex - 1, e);
+                }
+            }
+
+            @Override
+            public void add(E e) {
+                throw new UnsupportedOperationException();
+            }
+        };
+    }
+
+    @Override
+    public List<E> subList(int fromIndex, int toIndex) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Object[] toArray() {
+        return Arrays.copyOf(data, size);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T[] toArray(T[] a) {
+        if (a.length < size) {
+            return (T[]) Arrays.copyOf(data, size, a.getClass());
+        }
+        System.arraycopy(data, 0, a, 0, size);
+        if (a.length > size) {
+            a[size] = null;
+        }
+        return a;
     }
 
     @Override

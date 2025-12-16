@@ -8,10 +8,35 @@ public class Student {
     private final double averageGrade;
     private final int recordBookNumber;
 
-    private Student(Builder builder) {
-        this.groupNumber = builder.groupNumber;
-        this.averageGrade = builder.averageGrade;
-        this.recordBookNumber = builder.recordBookNumber;
+    public Student(String groupNumber, double averageGrade, int recordBookNumber) {
+        validateGroupNumber(groupNumber);
+        validateAverageGrade(averageGrade);
+        validateRecordBookNumber(recordBookNumber);
+
+        this.groupNumber = groupNumber;
+        this.averageGrade = averageGrade;
+        this.recordBookNumber = recordBookNumber;
+    }
+
+    private void validateGroupNumber(String groupNumber) {
+        if (groupNumber == null || groupNumber.trim().isEmpty()) {
+            throw new IllegalArgumentException("Номер группы не может быть null или пустым");
+        }
+        if (groupNumber.trim().length() > 20) {
+            throw new IllegalArgumentException("Номер группы не может быть длиннее 20 символов");
+        }
+    }
+
+    private void validateAverageGrade(double averageGrade) {
+        if (averageGrade < 0.0 || averageGrade > 5.0) {
+            throw new IllegalArgumentException("Средний балл должен быть в диапазоне от 0.0 до 5.0, получено: " + averageGrade);
+        }
+    }
+
+    private void validateRecordBookNumber(int recordBookNumber) {
+        if (recordBookNumber <= 0) {
+            throw new IllegalArgumentException("Номер зачетки должен быть положительным числом, получено: " + recordBookNumber);
+        }
     }
 
     public String getGroupNumber() {
