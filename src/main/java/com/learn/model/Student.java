@@ -58,7 +58,7 @@ public class Student {
         private double averageGrade;
         private int recordBookNumber;
 
-        private Builder() {
+        public Builder() {
         }
 
         public Builder groupNumber(String groupNumber) {
