@@ -20,10 +20,10 @@ class SortingAlgorithmsTest {
     );
 
     private final List<SortStrategy> specialStrategies = List.of(
-            new SpecialBubbleSort(),
-            new SpecialInsertionSort(),
-            new SpecialQuickSort(),
-            new SpecialMergeSort()
+            new EvenOnlySortStrategy(new BubbleSort()),
+            new EvenOnlySortStrategy(new InsertionSort()),
+            new EvenOnlySortStrategy(new QuickSort()),
+            new EvenOnlySortStrategy(new MergeSort())
     );
 
     private CustomArrayList<Student> createTestList() {

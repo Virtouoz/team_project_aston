@@ -1,9 +1,13 @@
 package com.learn.sort;
 
 import com.learn.model.Student;
+
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Implementation of Quick Sort algorithm.
+ */
 public class QuickSort implements SortStrategy {
     private Comparator<Student> comparator;
 

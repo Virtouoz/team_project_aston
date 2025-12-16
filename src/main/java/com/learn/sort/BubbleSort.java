@@ -1,9 +1,13 @@
 package com.learn.sort;
 
 import com.learn.model.Student;
+
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Implementation of Bubble Sort algorithm.
+ */
 public class BubbleSort implements SortStrategy {
     @Override
     public void sort(List<Student> students, Comparator<Student> comparator) {

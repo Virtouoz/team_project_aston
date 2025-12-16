@@ -9,13 +9,16 @@ import com.learn.sort.*;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
 import java.util.Scanner;
 
+/**
+ * Application entry point.
+ * Implements a console menu for working with the student list:
+ * filling, viewing, sorting, writing to file, multithreaded search.
+ */
 public class Main {
     private static final StudentService studentService = new StudentService();
     private static final Scanner scanner = new Scanner(System.in);
-    private static final Random random = new Random();
 
     public static void main(String[] args) {
         boolean running = true;
@@ -122,9 +125,11 @@ public class Main {
     }
 
     private static void printStudents(List<Student> students) {
+        int i = 0;
         for (Student student : students) {
+            i++;
             String marker = student.getRecordBookNumber() % 2 == 0 ? "(чет)" : "(нечет)";
-            System.out.println("  " + student + " " + marker);
+            System.out.printf("%3d. %s %s%n", i, student, marker);
         }
     }
 
@@ -147,14 +152,14 @@ public class Main {
         }
 
         System.out.println("\n=== Выбор алгоритма сортировки ===");
-        System.out.println("1. Bubble Sort");
-        System.out.println("2. Insertion Sort");
-        System.out.println("3. Quick Sort");
-        System.out.println("4. Merge Sort");
-        System.out.println("5. Special Bubble Sort (только четные)");
-        System.out.println("6. Special Insertion Sort (только четные)");
-        System.out.println("7. Special Quick Sort (только четные)");
-        System.out.println("8. Special Merge Sort (только четные)");
+        System.out.println("1. Сортировка пузырьком");
+        System.out.println("2. Сортировка вставками");
+        System.out.println("3. Быстрая сортировка");
+        System.out.println("4. Сортировка объединением");
+        System.out.println("5. Специальная сортировка пузырьком (только четные)");
+        System.out.println("6. Специальная сортировка вставками (только четные)");
+        System.out.println("7. Специальная быстрая сортировка (только четные)");
+        System.out.println("8. Специальная сортировка объединением (только четные)");
         System.out.print("Выберите алгоритм: ");
         int algorithm = getChoice();
         SortStrategy strategy = getStrategy(algorithm);
@@ -163,11 +168,23 @@ public class Main {
             return;
         }
 
-        CustomArrayList<Student> sortedStudents = copyList(studentService.getStudents());
-        studentService.sort(strategy, comparator);
+        System.out.println("1. Сортировать копию списка");
+        System.out.println("2. Сортировать сам список");
+        int listCopy = getChoice();
+        switch (listCopy) {
+            case 1 -> {
+                CustomArrayList<Student> toSort = copyList(studentService.getStudents());
+                strategy.sort(toSort, comparator);
+                System.out.println("\n=== Результат сортировки ===");
+                printStudents(toSort);
+            }
+            default -> {
+                studentService.sort(strategy, comparator);
+                System.out.println("\n=== Результат сортировки ===");
+                printStudents(studentService.getStudents());
+            }
+        }
 
-        System.out.println("\n=== Результат сортировки ===");
-        printStudents(studentService.getStudents());
     }
 
     private static Comparator<Student> getComparator(int field) {
@@ -185,19 +202,17 @@ public class Main {
             case 2 -> new InsertionSort();
             case 3 -> new QuickSort();
             case 4 -> new MergeSort();
-            case 5 -> new SpecialBubbleSort();
-            case 6 -> new SpecialInsertionSort();
-            case 7 -> new SpecialQuickSort();
-            case 8 -> new SpecialMergeSort();
+            case 5 -> new EvenOnlySortStrategy(new BubbleSort());
+            case 6 -> new EvenOnlySortStrategy(new InsertionSort());
+            case 7 -> new EvenOnlySortStrategy(new QuickSort());
+            case 8 -> new EvenOnlySortStrategy(new MergeSort());
             default -> null;
         };
     }
 
     private static CustomArrayList<Student> copyList(CustomArrayList<Student> source) {
         CustomArrayList<Student> copy = new CustomArrayList<>();
-        for (Student student : source) {
-            copy.add(student);
-        }
+        copy.addAll(source);
         return copy;
     }
 

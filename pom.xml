@@ -27,7 +27,6 @@
             <email>alex.kliutsuk@gmail.com</email>
             <roles>
                 <role>Team Lead</role>
-                <role>to do</role>
             </roles>
             <timezone>+3</timezone>
         </developer>
@@ -38,6 +37,7 @@
             <roles>
                 <role>dev</role>
                 <role>custom collection</role>
+                <role>menu</role>
             </roles>
             <timezone>+3</timezone>
         </developer>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>RELEASE</version>
+            <version>5.11.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

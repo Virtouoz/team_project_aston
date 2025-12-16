@@ -2,6 +2,15 @@ package com.learn.collection;
 
 import java.util.*;
 
+/**
+ * Custom implementation of the {@link java.util.List}&lt;E&gt; interface based on an array.
+ * <p>
+ * Supports all required List methods, including iterator and listIterator.
+ * Array capacity is automatically increased when needed.
+ * </p>
+ *
+ * @param <E> the type of elements in the list
+ */
 public class CustomArrayList<E> implements List<E> {
     private Object[] data;
     private int size;

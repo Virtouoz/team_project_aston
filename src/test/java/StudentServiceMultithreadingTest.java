@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class StudentServiceMultithreadTest {
+class StudentServiceMultithreadingTest {
 
     @Test
-    void testMultithreadedCountOccurrences() throws InterruptedException {
+    void testMultithreadedCountOccurrences() {
         StudentService service = new StudentService();
 
         for (int i = 0; i < 100; i++) {

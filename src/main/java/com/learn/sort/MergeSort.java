@@ -2,9 +2,13 @@ package com.learn.sort;
 
 import com.learn.collection.CustomArrayList;
 import com.learn.model.Student;
+
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Implementation of Merge Sort algorithm.
+ */
 public class MergeSort implements SortStrategy {
     private Comparator<Student> comparator;
 
@@ -27,8 +31,8 @@ public class MergeSort implements SortStrategy {
     }
 
     private void merge(List<Student> students, int left, int mid, int right) {
-        List<Student> leftList = new CustomArrayList<Student>();
-        List<Student> rightList = new CustomArrayList<Student>();
+        List<Student> leftList = new CustomArrayList<>();
+        List<Student> rightList = new CustomArrayList<>();
 
         for (int i = left; i <= mid; i++) {
             leftList.add(students.get(i));
@@ -37,7 +41,9 @@ public class MergeSort implements SortStrategy {
             rightList.add(students.get(i));
         }
 
-        int i = 0, j = 0, k = left;
+        int i = 0;
+        int j = 0;
+        int k = left;
         while (i < leftList.size() && j < rightList.size()) {
             if (comparator.compare(leftList.get(i), rightList.get(j)) <= 0) {
                 students.set(k++, leftList.get(i++));

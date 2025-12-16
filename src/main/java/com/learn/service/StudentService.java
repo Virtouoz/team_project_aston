@@ -13,13 +13,17 @@ import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
+/**
+ * Service class for working with the student list.
+ * Contains methods for filling, sorting, multithreaded search, and clearing.
+ */
 public class StudentService {
     private final CustomArrayList<Student> students = new CustomArrayList<>();
     private Random rnd = new Random();
 
     public void fillRandom(int count) {
         List<Student> newStudents = IntStream.range(0, count)
-                .mapToObj(i -> new Student.Builder()
+                .mapToObj(i -> Student.builder()
                         .groupNumber("Г" + (rnd.nextInt(10) + 1))
                         .averageGrade(rnd.nextDouble() * 5.0)
                         .recordBookNumber(1000 + rnd.nextInt(9000))
@@ -36,7 +40,7 @@ public class StudentService {
             double grade = Double.parseDouble(scanner.nextLine());
             int book = Integer.parseInt(scanner.nextLine());
 
-            Student student = new Student.Builder()
+            Student student = Student.builder()
                     .groupNumber(group)
                     .averageGrade(grade)
                     .recordBookNumber(book)
@@ -55,6 +59,13 @@ public class StudentService {
         strategy.sort(students, comparator);
     }
 
+    /**
+     * Multithreaded count of students with the given record book number.
+     *
+     * @param targetRecordBookNumber the target record book number to search for
+     * @param numThreads             number of threads (minimum 1)
+     * @return the number of occurrences
+     */
     public int countOccurrences(int targetRecordBookNumber, int numThreads) {
         if (numThreads <= 0) numThreads = 1;
         int chunkSize = students.size() / numThreads;
