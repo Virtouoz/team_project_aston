@@ -9,15 +9,17 @@
     <version>1.0-SNAPSHOT</version>
     <name>Aston Project</name>
     <developers>
-        <!-- Добавьте себя -->
-        <!-- TODO-->
         <developer>
-            <id>id</id>
-            <name>Name</name>
-            <email>email@qwe.ru</email>
+            <id>GarpikeS</id>
             <roles>
-                <role>role</role>
-                <role>что делаю</role>
+                <role>dev</role>
+            </roles>
+            <timezone>+3</timezone>
+        </developer>
+        <developer>
+            <id>Magnetaros</id>
+            <roles>
+                <role>dev</role>
             </roles>
             <timezone>+3</timezone>
         </developer>
