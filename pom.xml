@@ -43,6 +43,16 @@
             </roles>
             <timezone>+3</timezone>
         </developer>
+        <developer>
+            <id>magnetaros</id>
+            <name>Тиханкин Даниил</name>
+            <email>t1hdan@yandex.ru</email>
+            <roles>
+                <role>dev</role>
+                <role>file access</role>
+            </roles>
+            <timezone>+3</timezone>
+        </developer>
     </developers>
 
     <organization>
